@@ -18,16 +18,6 @@ public class InventoryController {
     @Autowired
     InventoryService inventoryService;
 
-    /*@GetMapping("/check")
-    public InventoryResponseDTO checkAvailableInventoryByItemId(
-            @RequestParam("itemId") Integer itemId,
-            @RequestParam("quantity") Integer requestedQuantity) {
-
-        log.info("Calling CheckAvailableInventoryByItemId for ItemId = {}", itemId);
-
-        return inventoryService.checkInventory(itemId, requestedQuantity);
-    }*/
-
     @RequestMapping("check/availableInventory")
     public InventoryResponseDTO checkAvailableInventory(@RequestBody InventoryRequestDTO inventoryRequest){
         log.info("Calling CheckAvailableInventoryByItemId for ItemId = {}", inventoryRequest.getItemId());

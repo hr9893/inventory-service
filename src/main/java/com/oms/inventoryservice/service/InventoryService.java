@@ -4,6 +4,7 @@ import com.oms.inventoryservice.dto.InventoryRequestDTO;
 import com.oms.inventoryservice.dto.InventoryResponseDTO;
 import com.oms.inventoryservice.entity.Inventory;
 import com.oms.inventoryservice.repository.InventoryRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class InventoryService {
         return inventoryRepository.save(invResponse);
     }
 
+    @Transactional
     private InventoryResponseDTO updateInventory(Integer itemId, Integer requestedQuantity, Inventory invResponse) {
         final String methodName = "updateInventory";
         logger.info("Entry", methodName);
@@ -61,6 +63,7 @@ public class InventoryService {
             inventoryResponseDTO.setItemInStock(false);
         }
         inventoryResponseDTO.setItemId(itemId);
+        inventoryResponseDTO.setItemDescription(invResponse.getItemDescription());
         inventoryResponseDTO.setUnitPrice(invResponse.getPrice());
         inventoryResponseDTO.setItemQuantity(requestedQuantity);
 
