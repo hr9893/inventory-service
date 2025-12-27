@@ -12,7 +12,8 @@ WORKDIR /app
 # Copy the jar from build stage
 COPY --from=build /app/target/*.jar inventory-service.jar
 
-# Expose the port
-EXPOSE 8083
+# Expose application port + debug port
+EXPOSE 8083 5005
 
-ENTRYPOINT ["java", "-jar", "inventory-service.jar"]
+# Enable remote debugging
+ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005","-jar","inventory-service.jar"]

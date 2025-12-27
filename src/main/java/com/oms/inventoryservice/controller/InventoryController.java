@@ -25,8 +25,8 @@ public class InventoryController {
         return inventoryResponse;
     }
 
-    @GetMapping("/itemId")
-    public List<Inventory> getInventoryByItemId(@RequestParam Integer itemId){
+    @GetMapping("/itemId/{itemId}")
+    public List<Inventory> getInventoryByItemId(@PathVariable Integer itemId){
         List<Inventory> response = inventoryService.getInventoryById(itemId);
         return response;
     }

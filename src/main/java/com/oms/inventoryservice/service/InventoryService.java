@@ -20,18 +20,31 @@ public class InventoryService {
     @Autowired
     InventoryRepository inventoryRepository;
 
+    @Transactional
     public InventoryResponseDTO checkInventory(InventoryRequestDTO requestDTO) {
         final String methodName = "checkInventory";
-        log.info("Entry", methodName);
+        log.info("Entry {} ", methodName);
+        InventoryResponseDTO inventoryResponseDTO = new InventoryResponseDTO();
+        Inventory invResponse = inventoryRepository.findById(requestDTO.getItemId())
+                .orElseThrow(() ->
+                        new RuntimeException("Inventory not found for itemId " + requestDTO.getItemId())
+                );
+        log.info("Inventory response {}", invResponse);
 
-        Inventory invResponse = getInventoryByItemId(requestDTO.getItemId());
-        return updateInventory(requestDTO.getItemId(), requestDTO.getItemQuantity(), invResponse);
-    }
+        if(invResponse.getAvailableQuantity() >= requestDTO.getItemQuantity()) {
+            invResponse.setAvailableQuantity(invResponse.getAvailableQuantity() - requestDTO.getItemQuantity());
+            log.info("Updating Inventory Request {}", invResponse);
 
-    public Inventory getInventoryByItemId(Integer itemId)
-    {
-        return inventoryRepository.findById(itemId)
-                .orElse(null);
+            inventoryResponseDTO.setItemInStock(true);
+        } else {
+            inventoryResponseDTO.setItemInStock(false);
+        }
+        inventoryResponseDTO.setItemId(requestDTO.getItemId());
+        inventoryResponseDTO.setItemDescription(invResponse.getItemDescription());
+        inventoryResponseDTO.setUnitPrice(invResponse.getPrice());
+        inventoryResponseDTO.setItemQuantity(requestDTO.getItemQuantity());
+
+        return inventoryResponseDTO;
     }
 
     public Inventory saveInventory(Integer itemId, Integer availableQuantity, Integer itemPrice){
@@ -41,35 +54,6 @@ public class InventoryService {
         invResponse.setPrice(itemPrice);
         log.info("Saved/Updated inventory",invResponse);
         return inventoryRepository.save(invResponse);
-    }
-
-    @Transactional
-    private InventoryResponseDTO updateInventory(Integer itemId, Integer requestedQuantity, Inventory invResponse) {
-        final String methodName = "updateInventory";
-        logger.info("Entry", methodName);
-
-        InventoryResponseDTO inventoryResponseDTO = new InventoryResponseDTO();
-
-        if(invResponse.getAvailableQuantity() >= requestedQuantity) {
-            Inventory updatedInventory = new Inventory();
-            updatedInventory.setItemId(itemId);
-            updatedInventory.setAvailableQuantity(invResponse.getAvailableQuantity() - requestedQuantity);
-            updatedInventory.setPrice(invResponse.getPrice());
-
-            inventoryRepository.save(updatedInventory);
-
-            inventoryResponseDTO.setItemInStock(true);
-        } else {
-            inventoryResponseDTO.setItemInStock(false);
-        }
-        inventoryResponseDTO.setItemId(itemId);
-        inventoryResponseDTO.setItemDescription(invResponse.getItemDescription());
-        inventoryResponseDTO.setUnitPrice(invResponse.getPrice());
-        inventoryResponseDTO.setItemQuantity(requestedQuantity);
-
-        logger.info("Exit", methodName);
-
-        return inventoryResponseDTO;
     }
 
     public List<Inventory> getInventoryById(Integer itemId){

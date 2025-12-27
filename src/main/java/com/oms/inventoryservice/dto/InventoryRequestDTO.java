@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class InventoryRequestDTO {
     private Integer itemQuantity;
     private Integer itemId;
-
 }
